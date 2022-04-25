@@ -1,45 +1,25 @@
 import React from "react";
+import { API_URI } from "../env";
 import MainContext from "./main-context";
-const api = "http://localhost:4000";
+
 
 const defaultState = {
     user: null,
-    friends: [],
     error: null,
 };
 
 const reducer = (state, action) => {
     switch (action.type) {
-        case "ADD_FRIEND":
+        case "SET_USER":
             return {
                 ...state,
-                friends: [...state.friends, action.friend],
+                user: action.payload,
             };
-        case "REMOVE_FRIEND":
-            return {
-                ...state,
-                friends: state.friends.filter(
-                    (friend) => friend.id !== action.friend.id
-                ),
-            };
-        case "LOGIN":
-            return {
-                ...state,
-                user: action.user,
-            };
-
-        case "LOGOUT":
-            return {
-                ...state,
-                user: {},
-            };
-
         case "SET_ERROR":
             return {
                 ...state,
-                error: action.error,
+                error: action.payload,
             };
-
         default:
             return state;
     }
@@ -52,7 +32,7 @@ export default function MainContexProvider({ children }) {
         const token = localStorage.getItem("token");
         if (!token) return;
         try {
-            const response = await fetch(`${api}/user/validate`, {
+            const response = await fetch(`${API_URI}/user/validate`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -64,8 +44,8 @@ export default function MainContexProvider({ children }) {
                 localStorage.removeItem("token");
             } else {
                 dispatch({
-                    type: "LOGIN",
-                    user: data,
+                    type: "SET_USER",
+                    payload: data,
                 });
             }
         } catch (err) {
@@ -75,15 +55,10 @@ export default function MainContexProvider({ children }) {
 
     const value = {
         user: mainReducer.user,
-
-        friends: mainReducer.friends,
-        addFriend: (friend) => dispatch({ type: "ADD_FRIEND", friend }),
-        removeFriend: (friend) => dispatch({ type: "REMOVE_FRIEND", friend }),
-        login: (user) => dispatch({ type: "LOGIN", user }),
-        logout: () => dispatch({ type: "LOGOUT" }),
-        validate: () => validateToken(),
         error: mainReducer.error,
-        setError: (error) => dispatch({ type: "SET_ERROR", error }),
+        validateToken,
+        setUser: (user) => dispatch({ type: "SET_USER", payload: user }),
+        setError: (error) => dispatch({ type: "SET_ERROR", payload: error }),
     };
 
     return (

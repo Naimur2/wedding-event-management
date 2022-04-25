@@ -1,7 +1,19 @@
-a {
+a,
+.link {
     text-decoration: none !important;
-    color: inherit !important;
+    color: #acabab !important;
     font-family: inherit;
+    padding: 0.5rem 1rem;
+}
+
+a.active,
+.link.active {
+    color: aliceblue !important;
+}
+
+a:is(:hover, :focus),
+.link:is(:hover, :focus) {
+    color: #eedada !important;
 }
 
 body {

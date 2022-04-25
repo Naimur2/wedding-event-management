@@ -1,32 +1,30 @@
 import React from "react";
 import { Button, Container, Form, Stack } from "react-bootstrap";
 import { Link, useNavigate } from "react-router-dom";
+import { API_URI } from "../../env";
 import MainContext from "../../store/main-context";
-import SocketContext from "./../../store/socket-context";
-
-const api = "http://localhost:4000";
 
 export default function Login() {
     const navigate = useNavigate();
-    const [phone, setPhone] = React.useState("");
+    const [email, setEmail] = React.useState("");
     const [password, setPassword] = React.useState("");
     const [isPassword, setIsPassword] = React.useState(false);
     const mainCtx = React.useContext(MainContext);
-    const socketCtx = React.useContext(SocketContext);
 
     const handleChange = (e, type) => {
-        if (type === "phone") setPhone(e.target.value);
+        if (type === "email") setEmail(e.target.value);
         else if (type === "password") setPassword(e.target.value);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
             const formData = {
-                phone,
+                email,
                 password,
             };
-            const response = await fetch(`${api}/user/login`, {
+            const response = await fetch(`${API_URI}/auth/login`, {
                 method: "POST",
                 body: JSON.stringify(formData),
                 headers: {
@@ -34,17 +32,24 @@ export default function Login() {
                 },
             });
             const data = await response.json();
-            if (data.error) {
+            console.log(data);
+
+            if (response.status !== 200) {
                 alert("Invalid phone or password");
+                mainCtx.setError({
+                    type: "login",
+                    error: { message: "Invalid phone or password" },
+                });
             } else {
-                localStorage.setItem("token", data.access_token);
-                mainCtx.login(data.user);
-                socketCtx.setPeer();
-                socketCtx.setSocket(data.user);
-                navigate("/dashboard");
+                console.log(data);
+                mainCtx.setUser(data.data);
+                if (data.data.role === "admin") {
+                    navigate("/dashboard");
+                    console.log("admin");
+                } else navigate("/user");
             }
         } catch (err) {
-            console.log(err);
+            mainCtx.setError({ type: "login", error: err });
         }
     };
 
@@ -52,15 +57,14 @@ export default function Login() {
         <Container className="mt-4">
             <h1>Login</h1>
             <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3" controlId="phone">
-                    <Form.Label>Phone Number</Form.Label>
+                <Form.Group className="mb-3" controlId="email">
+                    <Form.Label>Email</Form.Label>
                     <Form.Control
-                        onChange={(e) => handleChange(e, "phone")}
+                        onChange={(e) => handleChange(e, "email")}
                         required
-                        type="text"
-                        placeholder="Enter mobile"
-                        maxLength={12}
-                        value={phone}
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
                     />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="password">

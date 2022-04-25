@@ -2,14 +2,10 @@ import React from "react";
 
 const MainContext = React.createContext({
     user: null,
-    friends: [],
-    addFriend: () => {},
-    removeFriend: () => {},
-    login: () => {},
-    logout: () => {},
-    validate: () => {},
+    validateToken: () => {},
     error: null,
     setError: () => {},
+    setUser: () => {},
 });
 
 export default MainContext;

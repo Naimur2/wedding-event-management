@@ -5,21 +5,14 @@ import App from "./App";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
 import MainContexProvider from "./store/MainContexProvider";
-import SocketProvider from "./store/SocketProvider";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-    <>
-        <MainContexProvider>
-           
-                <SocketProvider>
-                    <BrowserRouter>
-                        <App />
-                    </BrowserRouter>
-                </SocketProvider>
-           
-        </MainContexProvider>
-    </>
+    <MainContexProvider>
+        <BrowserRouter>
+            <App />
+        </BrowserRouter>
+    </MainContexProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function
